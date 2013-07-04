@@ -46,40 +46,11 @@ gameboard.SetCellValue(8, 8, 5)
 
 gameboard.PrintBoardState()
 
-#poss = gameboard.GetPossibilitiesForCell(7, 7)
-#print "Possibilities for 7, 7"
-#for x in poss:
-#	print "%s" % x
+print "Running solver"
+if not gameboard.RecursiveSolve():
+	print "Failed to solve!"
+else:
+	print "Solved!"
 
-#poss = gameboard.GetPossibilitiesForCell(1, 1)
-#print "Possibilities for 1, 1"
-#for x in poss:
-#	print "%s" % x
-
-print "Running first pass"
-gameboard.SinglePossPass()
-gameboard.PrintBoardState()
-
-for x in xrange(100):
-	if not gameboard.solved:
-		gameboard.SinglePossPass()
-	else:
-		print "Solved!"
-
-print "Gameboard post single poss passes"
-gameboard.PrintBoardState()
-
-print "Running Set check pass"
-gameboard.SetCheckPass()
-gameboard.PrintBoardState()
-
-for x in xrange(100):
-	if not gameboard.solved:
-		gameboard.SetCheckPass()
-	else:
-		print "Solved!"
-
-print "Gameboard post set check passes"
-gameboard.PrintBoardState()
-
+print gameboard.PrintBoardState()
 

@@ -37,7 +37,7 @@ class Board:
 	
 	# Get the appropriate set for a cell
 	def GetSqrSetForCell(self, i, j):
-		index = int(math.floor((i / self.range))) + int(math.floor((j / self.range)))
+		index = (int(math.floor((i / self.range))) * self.range) + int(math.floor((j / self.range)))
 		return self.sqset[index]
 
 	# Return the set of value possiblities for a cell
@@ -51,15 +51,22 @@ class Board:
 		self.colset[j].discard(value)
 		self.GetSqrSetForCell(i, j).discard(value)
 		
+		print "Cell(%s, %s) set to %s" % (i, j, value)
+
 		self.solvedcells += 1
 		if self.solvedcells >= (self.fullset * self.fullset):
 			self.solved = True
 
-
+	# Returns true if a cell has only possiblity and been set to that
 	def CheckCellForSinglePossibility(self, i, j):
 		if self.cells[i][j].number is None:
 			if len(self.GetPossibilitiesForCell(i, j)) == 1:
 				self.SetCellValue(i, j, self.GetPossibilitiesForCell(i,j).pop())
+				return True
+			else:
+				return False
+		else:
+			return False
 
 	def PrintBoardState(self):
 		line = "|"
@@ -79,13 +86,16 @@ class Board:
 	# Tactic #1
 	# Check each cell to see if there is only one possibility for the value
 	def SinglePossPass(self):
+		result = False
 		for i in xrange(self.fullset):
 			for j in xrange(self.fullset):
-				self.CheckCellForSinglePossibility(i, j)
+				result |= self.CheckCellForSinglePossibility(i, j)
+		return result
 
 	# Tactic #2
 	# Check each set to see particular values can only appear in one cell in the set
 	def SetCheckPass(self):
+		result = False
 		# Rows
 		for i in xrange(self.fullset):
 			for x in xrange(1, self.fullset+1):
@@ -96,5 +106,38 @@ class Board:
 							colidexcoll.append(j)
 				if len(colidexcoll) == 1:
 					self.SetCellValue(i, colidexcoll[0], x)
+					result |= True
+		
+		# Columns
+		for j in xrange(self.fullset):
+			for x in xrange(1, self.fullset+1):
+				rowidexcoll = []
+				for i in xrange(self.fullset):
+					if self.cells[i][j].number is None:
+						if x in self.GetPossibilitiesForCell(i, j):
+							rowidexcoll.append(i)
+				if len(rowidexcoll) == 1:
+					self.SetCellValue(rowidexcoll[0], j, x)
+					result |= True
+
+
+		return result
+
+
+	def RecursiveSolve(self):
+		if not self.solved:
+			singlecount = 0
+			setcheckcount = 0
+			while self.SinglePossPass():
+				singlecount += 1
+			while self.SetCheckPass():
+				setcheckcount += 1
+			
+			if singlecount + setcheckcount > 0:
+				self.RecursiveSolve()
+			else:
+				return False
+		else:
+			return True
 
 
