@@ -19,6 +19,21 @@ class Board:
 	solved = False
 
 	def __init__(self):
+		self.SetBoardSize(3)
+		
+	
+	# Reset the board to size given by inrange
+	def SetBoardSize(self, inrange):
+		self.range = inrange
+		self.fullset = self.range * self.range
+		
+		self.rowset = []
+		self.colset = []
+		self.sqset = []
+
+		self.solvedcells = 0
+		self.solved = False
+
 		# Build the board
 		for x in xrange(self.fullset):
 			row = []
@@ -33,7 +48,7 @@ class Board:
 			self.rowset.append(set(tempset))
 			self.colset.append(set(tempset))
 			self.sqset.append(set(tempset))
-	
+
 	
 	# Get the appropriate set for a cell
 	def GetSqrSetForCell(self, i, j):
@@ -51,7 +66,7 @@ class Board:
 		self.colset[j].discard(value)
 		self.GetSqrSetForCell(i, j).discard(value)
 		
-		print "Cell(%s, %s) set to %s" % (i, j, value)
+		# print "Cell(%s, %s) set to %s" % (i, j, value)
 
 		self.solvedcells += 1
 		if self.solvedcells >= (self.fullset * self.fullset):
@@ -81,7 +96,21 @@ class Board:
 				line += " %s |" % cval
 			print line
 			print uline			
-			line = ""
+			line = "|"
+
+	def PrintBoardAsCsv(self):
+		output = ""
+		for i in xrange(self.fullset):
+			for j in xrange(self.fullset):
+				cval = 0
+				if self.cells[i][j].number is not None:
+					cval = self.cells[i][j].number
+				output += "%s" % cval
+				if j < self.fullset - 1:
+					output += ", "
+			output += "\n"
+		print output
+					
 
 	# Tactic #1
 	# Check each cell to see if there is only one possibility for the value
@@ -123,7 +152,7 @@ class Board:
 
 		return result
 
-
+	# Attempt to solve, alternating between single possibliy check and set check
 	def RecursiveSolve(self):
 		if not self.solved:
 			singlecount = 0
@@ -136,7 +165,10 @@ class Board:
 			if singlecount + setcheckcount > 0:
 				self.RecursiveSolve()
 			else:
-				return False
+				if self.solved:
+					return True
+				else:
+					return False
 		else:
 			return True
 
