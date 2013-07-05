@@ -3,7 +3,7 @@ from cell import Cell
 from board import Board
 import boardfromtext
 
-infile = "./game1.csv"
+infile = "./game2.csv"
 
 gameboard = boardfromtext.LoadFromFile(infile)
 #gameboard = Board()

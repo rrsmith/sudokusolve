@@ -49,10 +49,14 @@ class Board:
 			self.colset.append(set(tempset))
 			self.sqset.append(set(tempset))
 
-	
-	# Get the appropriate set for a cell
-	def GetSqrSetForCell(self, i, j):
+	# Get the index of the sqr set for a cell
+	def GetSqrSetIndex(self, i, j):
 		index = (int(math.floor((i / self.range))) * self.range) + int(math.floor((j / self.range)))
+		return index
+
+	# Get the possibility set of the sqr set of a cell
+	def GetSqrSetForCell(self, i, j):
+		index = self.GetSqrSetIndex(i, j)
 		return self.sqset[index]
 
 	# Return the set of value possiblities for a cell
@@ -122,7 +126,8 @@ class Board:
 		return result
 
 	# Tactic #2
-	# Check each set to see particular values can only appear in one cell in the set
+	# Check each set to see if any values can only appear in one cell in the set
+	# Checking rows, columns then sqr sets
 	def SetCheckPass(self):
 		result = False
 		# Rows
@@ -147,6 +152,23 @@ class Board:
 							rowidexcoll.append(i)
 				if len(rowidexcoll) == 1:
 					self.SetCellValue(rowidexcoll[0], j, x)
+					result |= True
+
+
+		# Sqr sets
+		for k in xrange(self.fullset):
+			offseti = int(math.floor(k / self.range)) * self.range
+			offsetj = (k % self.range) * self.range
+			for x in xrange(1, self.fullset+1):
+				cellcoll = []
+				for i in xrange(offseti, offseti+self.range):
+					for j in xrange(offsetj, offsetj+self.range):
+						if self.cells[i][j].number is None:
+							if x in self.GetPossibilitiesForCell(i, j):
+								cellloc = [i, j]
+								cellcoll.append(cellloc)
+				if len(cellcoll) == 1:
+					self.SetCellValue(cellcoll[0][0], cellcoll[0][1], x)
 					result |= True
 
 
