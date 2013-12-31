@@ -1,17 +1,21 @@
 #!/usr/bin/python
 from cell import Cell
 from board import Board
+import argparse
 import boardfromtext
 
-infile = "./game2.csv"
 
-gameboard = boardfromtext.LoadFromFile(infile)
-#gameboard = Board()
+parser = argparse.ArgumentParser(description='Sudoku solver.')
+parser.add_argument('infile', help='A csv of game information')
+
+args = parser.parse_args()
+
+gameboard = boardfromtext.LoadFromFile(args.infile)
 
 gameboard.PrintBoardState()
 
 print "Running solver"
-if not gameboard.RecursiveSolve():
+if not gameboard.Solve():
 	print "Failed to solve!"
 else:
 	print "Solved!"
